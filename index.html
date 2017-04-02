@@ -1,0 +1,50 @@
+<html data-ng-app="Cocoweb">
+<head>
+<title>Coconode</title>
+<script src="/bower_components/angular/angular.js"></script>
+<script src="/bower_components/angular-websocket/dist/angular-websocket.js"></script>
+<script src="/script.js"></script>
+<link href="/style.css" media="all" rel="stylesheet" />
+</head>
+<body data-ng-controller="MainCtrl">
+<div id="status-bar">
+	<div class="connection-state" data-ng-class="{connected:connected}">connected</div>
+</div>
+<h1>Coconode</h1>
+<div id="boards">
+	<div data-ng-repeat="board in boards" class="board">
+		<h2>{{boardName(board)}}</h2>
+		<h3 data-ng-show="board.type == 'coco'">
+			<button data-ng-click="askName(board)">askName</button>
+			<button data-ng-click="askEvents(board)">askEvents</button>
+			<button data-ng-click="clearEvents(board)">clearEvents</button>
+		</h3>
+		<table class="sensors">
+			<tr data-ng-repeat="sensor in board.sensors" class="sensor">
+				<td class="code">{{sensor.code}}</td>
+				<td class="name">{{sensor.name}}</td>
+				<td class="value">
+					<span class="digital-out" data-ng-if="isDigitalOut(sensor)">
+						<button data-ng-disabled="isOn(sensor)" data-ng-click="command(board, sensor, true)">ON</button>
+						<button data-ng-disabled="!isOn(sensor)" data-ng-click="command(board, sensor, false)">OFF</button>
+					</span>
+					<span class="digital-out-two-way" data-ng-if="isDigitalOutTwoWay(sensor)">
+						<button data-ng-disabled="isPositive(sensor)"
+							data-ng-keydown="command(board, sensor, -1, 'keydown')"
+							data-ng-keyup="command(board, sensor, 0, 'keyup')"
+							data-ng-mousedown="command(board, sensor, -1, 'mousedown')"
+							data-ng-mouseup="command(board, sensor, 0, 'mouseup')">&lt;-</button>
+						<button data-ng-disabled="isNegative(sensor)"
+							data-ng-keydown="command(board, sensor, 1, 'keydown')"
+							data-ng-keyup="command(board, sensor, 0, 'keyup')"
+							data-ng-mousedown="command(board, sensor, 1, 'mousedown')"
+							data-ng-mouseup="command(board, sensor, 0, 'mouseup')">-&gt;</button>
+					</span>
+					<span data-ng-if="!isDigitalOut(sensor)">{{sensor_format(sensor, sensor.value)}}</span>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<body>
+</html>
