@@ -38,11 +38,7 @@ angular.module('Cocoweb')
 			$scope.boards.push(importClient(obj.newClient));
 		}
 		else if (obj.clientLost) {
-			for (var i = 0; i<$scope.boards.length; i++)
-				if ($scope.boards[i].address === obj.clientLost) {
-					$scope.boards.splice(i, 1);
-					break ;
-				}
+			removeDevice(obj.clientLost);
 		}
 		else if (obj.clientUpdate) {
 			console.info('client.sensors: ', JSON.stringify(obj.clientUpdate.sensors));
@@ -66,6 +62,15 @@ angular.module('Cocoweb')
 		for (var i=0; i<tab.length; i++)
 			tab[i] = importClient(tab[i]);
 		return tab;
+	}
+	
+	function	removeDevice(address) {
+		for (var i = 0; i<$scope.boards.length; i++)
+			if ($scope.boards[i].address === address) {
+				$scope.boards.splice(i, 1);
+				return;
+			}
+		console.warn('device ', address, ' not found for removing');
 	}
 	
 	function	importClient(client) {
@@ -167,8 +172,10 @@ angular.module('Cocoweb')
 			return 'n/a';
 		if (sensor.code.charAt(0) == 'a' || sensor.type == ANALOG_IN)
 			return value+'mA';
-		else if (sensor.code.charAt(0) == 'd')
-			return value? 'ON': 'OFF';
+		else if (typeof value === 'object')
+			return JSON.stringify(value);
+		// else if (sensor.code.charAt(0) == 'd')
+			// return value? 'ON': 'OFF';
 		else if (sensor.code.charAt(0) == 'i')
 			return value;
 		else
