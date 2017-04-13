@@ -1,0 +1,23 @@
+{
+  "name": "Cocoweb",
+  "short_name": "Cocoweb",
+  "icons": [
+    {
+      "src": "assets/favicon/favicon-60x60.png",
+      "sizes": "60x60",
+      "type": "image/webp"
+    },
+    {
+      "src": "assets/favicon/favicon-60x60.png",
+      "sizes": "60x60"
+    },
+    {
+      "src": "assets/favicon/favicon-120x120.png",
+      "sizes": "120x120",
+      "density": 2
+    }
+  ],
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "portrait"
+}
