@@ -11,7 +11,10 @@
 </head>
 <body data-ng-controller="MainCtrl">
 <div id="status-bar">
-	<div class="connection-state" data-ng-class="{connected:connected}">connected</div>
+	<div class="stats" data-ng-bind="stats">stats</div>
+	<div class="connection-state" data-ng-class="{connected:connected}">
+		<span class="label-connected">connected<span>
+	</div>
 </div>
 <h1>Coconode</h1>
 <div id="boards">

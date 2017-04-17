@@ -11,6 +11,7 @@ angular.module('Cocoweb')
 	var maxxBoard = null;
 	var motorLeft = null;
 	var motorRight = null;
+	$scope.stats = '';
 	var url = ($location.protocol() === 'https'? 'wss': 'ws')+'://'+$location.host()+($location.port()? ':'+$location.port(): '')+'/';
 	console.info('connecting to ', url);
 	
@@ -39,6 +40,9 @@ angular.module('Cocoweb')
 		}
 		else if (obj.clientLost) {
 			removeDevice(obj.clientLost);
+		}
+		else if (obj.stats) {
+			updateStats(obj.stats);
 		}
 		else if (obj.clientUpdate) {
 			console.info('client.sensors: ', JSON.stringify(obj.clientUpdate.sensors));
@@ -71,6 +75,12 @@ angular.module('Cocoweb')
 				return;
 			}
 		console.warn('device ', address, ' not found for removing');
+	}
+	
+	function	updateStats(stats) {
+		$scope.stats = (Math.round(stats.ping*100)/100)+' ms';
+		$scope.stats += ', '+(Math.round(stats.frequency*10)/10)+' req/s';
+		$scope.stats += ', '+Math.round(stats.succeed / (stats.succeed + stats.failed) * 100)+' %';
 	}
 	
 	function	importClient(client) {
@@ -131,6 +141,7 @@ angular.module('Cocoweb')
 		console.info('onClose');
 		$scope.connected = false;
 		// con.state = 'connecting';
+		$scope.stats = '';
 		$scope.$apply();
 	});
 	socket.onError(function() {
