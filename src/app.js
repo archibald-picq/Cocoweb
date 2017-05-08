@@ -32,12 +32,14 @@ angular.module('Cocoweb', [
 	if (baseUrl.indexOf(root) === 0)
 		baseUrl = baseUrl.substr(root.length);
 	
-	
 	return {
 		baseUrl: baseUrl,
-		apiUrl: typeof window.config === 'object' && window.config.api? window.config.api: root,
+		
 	};
 })())
+.config(['Server', function(Server) {
+	Server.apiUrl = typeof window.config === 'object' && window.config.api? window.config.api: root;
+}])
 /**
  * create a stub function to register templates
  * http://stackoverflow.com/questions/25168593/angularjs-lazy-loading-controllers-and-content
