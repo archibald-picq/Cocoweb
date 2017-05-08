@@ -1,11 +1,11 @@
-<div id="status-bar">
+<div class="status-bar">
 	<div class="stats" data-ng-bind="stats">stats</div>
 	<div class="connection-state" data-ng-class="{connected:connected}">
 		<span class="label-connected">connected<span>
 	</div>
 </div>
 <h1>Coconode</h1>
-<div id="boards">
+<div class="boards">
 	<div data-ng-repeat="board in boards" class="board">
 		<h2>{{boardName(board)}}</h2>
 		<h3 data-ng-show="board.type == 'coco'">

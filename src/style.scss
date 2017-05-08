@@ -1,90 +1,96 @@
+$important: #ff0000;
+$main-color: #000000;
+$soft-color: #222222;
 
-#status-bar {
-	position:absolute;
-	top: 10px;
-	right: 10px;
-}
-#status-bar .stats {
-	display: inline-block;
-}
-#status-bar .connection-state {
-	display: inline-block;
-	border: 2px solid black;
-	padding:5px;
-}
-#status-bar .connection-state .label-connected {
-	visibility:hidden;
-}
-
-#status-bar .connection-state.connected .label-connected {
-	visibility:visible;
-}
-
-.board {
-	margin: 10px 0 0 0;
-}
-h1 {
-	margin: 0;
-}
-
+h1,
 h2 {
 	margin: 0;
 }
 
 h3 {
-	margin: 5px 0 10px 0;
-	color: #222;
+	color: $soft-color;
+	margin: 5px 0 10px;
 }
 
-#boards {
+.status-bar {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+
+	.stats {
+		display: inline-block;
+	}
+
+	.connection-state {
+		border: 2px solid $main-color;
+		display: inline-block;
+		padding: 5px;
+
+		.label-connected {
+			visibility: hidden;
+		}
+
+		&.connected .label-connected {
+			visibility: visible;
+		}
+	}
+}
+
+.boards {
+	align-content: stretch;
 	display: flex;
 	flex-wrap: wrap;
-	align-content: stretch;
+
+	.board {
+		flex: 1;
+		margin: 10px 0 0;
+		min-width: 300px;
+		padding: 0;
+
+		.sensors {
+			border-collapse: collapse;
+			width: 100%;
+
+			.sensor {
+				.code {
+					width: 50px;
+				}
+
+				.name {
+					width: 140px;
+				}
+
+				.value {
+					text-align: right;
+
+					button {
+						border: 1px;
+						padding: 1px;
+						width: 33px;
+					}
+				}
+			}
+		}
+	}
 }
 
-#boards .board {
-	padding: 0;
-	min-width: 300px;
-	flex: 1;
-}
-
-#boards .board .sensors {
-/*	table-layout: fixed;*/
-	width: 100%;
-	border-collapse: collapse;
-}
-
-#boards .board .sensors .sensor .code {
-	width: 50px;
-}
-#boards .board .sensors .sensor .name {
-	width: 140px;
-}
-#boards .board .sensors .sensor .value {
-	text-align: right;
-}
-
-#boards .board .sensors .sensor .value button {
-	width: 33px;
-	padding: 1px;
-	border: 1px;
-}
 
 
-.buttons, .axes {
-  padding: 1em;
+.buttons,
+.axes {
+	padding: 1em;
 }
 
 .button {
-  padding: 1em;
-  border-radius: 20px;
-  border: 1px solid black;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAAxJREFUCNdjYPjPAAACAgEAqiqeJwAAAABJRU5ErkJggg==);
-  background-size: 0% 0%;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAAxJREFUCNdjYPjPAAACAgEAqiqeJwAAAABJRU5ErkJggg==);
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-size: 0% 0%;
+	border: 1px solid $main-color;
+	border-radius: 20px;
+	padding: 1em;
 }
 
 .pressed {
-  border: 1px solid red;
+	border: 1px solid $important;
 }
