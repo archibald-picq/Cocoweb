@@ -1,6 +1,6 @@
 {
-  "name": "Cocoweb",
-  "description": "Websocket service Coconode network",
+  "name": "cocoweb",
+  "description": "Websocket interface for Coconode network",
   "main": "index.html",
   "authors": [
     "Archibald Picq"
@@ -10,7 +10,9 @@
     "websocket",
     "service",
     "dxy-990",
-    "plotter"
+    "plotter",
+    "dashboard",
+    "i2c"
   ],
   "moduleType": [],
   "homepage": "",
@@ -23,6 +25,8 @@
   ],
   "dependencies": {
     "angular": "^1.6.1",
-    "angular-websocket": "^2.0.0"
+    "angular-websocket": "^2.0.0",
+    "angular-ui-router": "^1.0.3",
+    "oclazyload": "^1.1.0"
   }
 }

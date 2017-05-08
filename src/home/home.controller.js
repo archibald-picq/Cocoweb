@@ -1,72 +1,33 @@
 (function() {
 'use strict';
 
-angular.module('Cocoweb', [
-	'angular-websocket',
-]);
+var DIGITAL_OUT = 0x01;		// for led, light, on/off purpose
+var DIGITAL_OUT_TWO_WAY = 0x02;	// for motor with 1 speed in both directions
+// var DIGITAL_OUT_THREE_WAY = 0x03;		// for led, light, on/off purpose
+// var DIGITAL_IN = 0x04;
+var ANALOG_IN = 0x05;
+	
+function	findByKey(array, search, keyName) {
+	for (var i=0; i<array.length; i++)
+		if (array[i] && array[i][keyName] === search)
+			return array[i];
+	return null;
+}
 
 angular.module('Cocoweb')
-.controller('MainCtrl', ['$scope', '$websocket', '$location', '$q', function($scope, $websocket, $location, $q) {
+.controller('HomeController', [
+            '$scope', '$websocket', '$location', '$q', 'Server',
+	function($scope,   $websocket,   $location,   $q,   Server) {
 	
 	var maxxBoard = null;
 	var motorLeft = null;
 	var motorRight = null;
-	$scope.stats = '';
-	var url = ($location.protocol() === 'https'? 'wss': 'ws')+'://'+$location.host()+($location.port()? ':'+$location.port(): '')+'/';
-	console.info('connecting to ', url);
+	var socket = null;
 	
-	var socket = $websocket(url, {reconnectIfNotNormalClose:true});
-	socket.onMessage(function(message) {
-		// con.messageCount++;
-		
-		// con.averages.push({time: new Date(), bytes: message.data.length});
-		// con.speed = calcBandwidth(con.averages);
-		// console.info('onMessage(',message.data,')');
-		var obj;
-		try {
-			obj = JSON.parse(message.data);
-		}
-		catch(e) {
-			console.warn('Unparsable payload "'+message+"': ", e.message);
-			return;
-		}
-		if (obj.response && obj.response.currentDevices) {
-			$scope.boards = importClients(obj.response.currentDevices);
-			console.info('boards: ', $scope.boards);
-		}
-		else if (obj.newClient) {
-			console.info('newClient(',obj.newClient,')');
-			$scope.boards.push(importClient(obj.newClient));
-		}
-		else if (obj.clientLost) {
-			removeDevice(obj.clientLost);
-		}
-		else if (obj.stats) {
-			updateStats(obj.stats);
-		}
-		else if (obj.clientUpdate) {
-			console.info('client.sensors: ', JSON.stringify(obj.clientUpdate.sensors));
-			for (var i = 0; i<$scope.boards.length; i++)
-				if ($scope.boards[i].address === obj.clientUpdate.address) {
-					$scope.boards[i] = importClient(obj.clientUpdate);
-					break ;
-				}
-		}
-		else if (obj.sensorsUpdate) {
-			// console.info('sensorsUpdate ', JSON.stringify(obj.sensorsUpdate));
-			updateSensors(obj.sensorsUpdate);
-		}
-		else
-			console.info('message: ', obj);
-		
-		$scope.$apply();
-	});
-	
-	function	importClients(tab) {
-		for (var i=0; i<tab.length; i++)
-			tab[i] = importClient(tab[i]);
-		return tab;
-	}
+	var AXIS_X = 0;
+	var AXIS_Y = 1;
+	var AXIS_Z = 5;
+	var THROTTLE = 6;
 	
 	function	removeDevice(address) {
 		for (var i = 0; i<$scope.boards.length; i++)
@@ -103,6 +64,12 @@ angular.module('Cocoweb')
 		return client;
 	}
 	
+	function	importClients(tab) {
+		for (var i=0; i<tab.length; i++)
+			tab[i] = importClient(tab[i]);
+		return tab;
+	}
+	
 	function	findBoard(addr) {
 		return findByKey($scope.boards, addr, 'address');
 	}
@@ -130,6 +97,65 @@ angular.module('Cocoweb')
 				
 			}
 	}
+	
+	function	send(obj) {
+		socket.send(JSON.stringify(obj));
+	}
+	
+	
+	
+	$scope.stats = '';
+	var url = Server.apiUrl;
+	url = url.replace(/^http(s?):/, 'ws$1:');
+	console.info('connecting to ', url);
+	
+	socket = $websocket(url, {reconnectIfNotNormalClose:true});
+	socket.onMessage(function(message) {
+		// con.messageCount++;
+		
+		// con.averages.push({time: new Date(), bytes: message.data.length});
+		// con.speed = calcBandwidth(con.averages);
+		// console.info('onMessage(',message.data,')');
+		var obj;
+		try {
+			obj = JSON.parse(message.data);
+		}
+		catch(e) {
+			console.warn('Unparsable payload "'+message+'\': ', e.message);
+			return;
+		}
+		if (obj.response && obj.response.currentDevices) {
+			$scope.boards = importClients(obj.response.currentDevices);
+			console.info('boards: ', $scope.boards);
+		}
+		else if (obj.newClient) {
+			console.info('newClient(',obj.newClient,')');
+			$scope.boards.push(importClient(obj.newClient));
+		}
+		else if (obj.clientLost) {
+			removeDevice(obj.clientLost);
+		}
+		else if (obj.stats) {
+			updateStats(obj.stats);
+		}
+		else if (obj.clientUpdate) {
+			console.info('client.sensors: ', JSON.stringify(obj.clientUpdate.sensors));
+			for (var i = 0; i<$scope.boards.length; i++)
+				if ($scope.boards[i].address === obj.clientUpdate.address) {
+					$scope.boards[i] = importClient(obj.clientUpdate);
+					break ;
+				}
+		}
+		else if (obj.sensorsUpdate) {
+			// console.info('sensorsUpdate ', JSON.stringify(obj.sensorsUpdate));
+			updateSensors(obj.sensorsUpdate);
+		}
+		else
+			console.info('message: ', obj);
+		
+		$scope.$apply();
+	});
+	
 	socket.onOpen(function() {
 		console.info('onOpen');
 		$scope.connected = true;
@@ -152,10 +178,6 @@ angular.module('Cocoweb')
 	
 	$scope.boards = [];
 	
-	function	send(obj) {
-		socket.send(JSON.stringify(obj));
-	}
-	
 	$scope.connected = false;
 	
 	// var allValue = 0;
@@ -175,29 +197,26 @@ angular.module('Cocoweb')
 	$scope.clearEvents = function(board) {
 		send({command:'clearEvents', params: {address: board.address}});
 	};
+	$scope.getDefinition = function(board) {
+		send({command:'getDefinition', params: {address: board.address}});
+	};
 	
 	
 	$scope.sensor_format = function(sensor, value) {
 		// console.info(name, sensor, value);
 		if (!sensor.code)
 			return 'n/a';
-		if (sensor.code.charAt(0) == 'a' || sensor.type == ANALOG_IN)
+		if (sensor.code.charAt(0) === 'a' || sensor.type === ANALOG_IN)
 			return value+'mA';
 		else if (typeof value === 'object')
 			return JSON.stringify(value);
 		// else if (sensor.code.charAt(0) == 'd')
 			// return value? 'ON': 'OFF';
-		else if (sensor.code.charAt(0) == 'i')
+		else if (sensor.code.charAt(0) === 'i')
 			return value;
 		else
 			return value;
 	};
-
-	var DIGITAL_OUT = 0x01;		// for led, light, on/off purpose
-	var DIGITAL_OUT_TWO_WAY = 0x02;	// for motor with 1 speed in both directions
-	var DIGITAL_OUT_THREE_WAY = 0x03;		// for led, light, on/off purpose
-	var DIGITAL_IN = 0x04;
-	var ANALOG_IN = 0x05;
 
 	$scope.isDigitalOut = function(sensor) {
 		return sensor.type === DIGITAL_OUT;
@@ -226,10 +245,10 @@ angular.module('Cocoweb')
 		
 		if (motorLeft && motorRight) {
 			if (AXIS_X < axes.length && AXIS_Y < axes.length && AXIS_Z < axes.length && THROTTLE && axes.length) {
-				var x = axes[AXIS_X];
+				// var x = axes[AXIS_X];
 				var y = axes[AXIS_Y];
 				var z = axes[AXIS_Z];
-				var throttle = axes[THROTTLE];
+				// var throttle = axes[THROTTLE];
 				
 				if (z < -0.5) {
 					$scope.command(maxxBoard, motorLeft, 1, 'gamepad');
@@ -272,15 +291,11 @@ angular.module('Cocoweb')
 	
 	
 	
-	var AXIS_X = 0;
-	var AXIS_Y = 1;
-	var AXIS_Z = 5;
-	var THROTTLE = 6;
 	
 		
 		
-	window.addEventListener("gamepadconnected", function(e) {
-		console.log("Contrôleur n°%d connecté : %s. %d boutons, %d axes.",
+	window.addEventListener('gamepadconnected', function(e) {
+		console.log('Contrôleur n°%d connecté : %s. %d boutons, %d axes.',
 		e.gamepad.index, e.gamepad.id,
 		e.gamepad.buttons.length, e.gamepad.axes.length);
 	});
@@ -289,93 +304,70 @@ angular.module('Cocoweb')
 	var rAF = window.mozRequestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
 		window.requestAnimationFrame;
+	var updateStatus;
 		
-	function connecthandler(e) {
-		addgamepad(e.gamepad);
-	}
-	function addgamepad(gamepad) {
-		console.info('addgamepad: ', gamepad);
-		controllers[gamepad.index] = gamepad; var d = document.createElement("div");
-		d.setAttribute("id", "controller" + gamepad.index);
-		var t = document.createElement("h1");
-		t.appendChild(document.createTextNode("gamepad: " + gamepad.id));
-		d.appendChild(t);
-		var b = document.createElement("div");
-		b.className = "buttons";
-		for (var i=0; i<gamepad.buttons.length; i++) {
-			var e = document.createElement("span");
-			e.className = "button";
-			//e.id = "b" + i;
-			e.innerHTML = i;
-			b.appendChild(e);
-		}
-		d.appendChild(b);
-		var a = document.createElement("div");
-		a.className = "axes";
-		for (i=0; i<gamepad.axes.length; i++) {
-			e = document.createElement("progress");
-			e.className = "axis";
-			//e.id = "a" + i;
-			e.setAttribute("max", "2");
-			e.setAttribute("value", "1");
-			e.innerHTML = i;
-			a.appendChild(e);
-		}
-		d.appendChild(a);
-		// document.getElementById("start").style.display = "none";
-		document.body.appendChild(d);
-		rAF(updateStatus);
-	}
-
-	function disconnecthandler(e) {
-		removegamepad(e.gamepad);
-	}
-
-	function removegamepad(gamepad) {
-		var d = document.getElementById("controller" + gamepad.index);
-		document.body.removeChild(d);
-		delete controllers[gamepad.index];
-	}
-
 	function	updateAxis(d, axes) {
-		var containers = d.getElementsByClassName("axis");
+		var containers = d.getElementsByClassName('axis');
 		for (var i=0; i<containers.length; i++) {
 			var a = containers[i];
-			a.innerHTML = i + ": " + axes[i].toFixed(4);
-			a.setAttribute("value", axes[i] + 1);
+			a.innerHTML = i + ': ' + axes[i].toFixed(4);
+			a.setAttribute('value', axes[i] + 1);
 		}
 		
 		sendCommand(axes);
 
 	}
-	function updateStatus() {
-		scangamepads();
-		for (var j in controllers) {
-			var controller = controllers[j];
-			var d = document.getElementById("controller" + j);
-			var buttons = d.getElementsByClassName("button");
-			for (var i=0; i<controller.buttons.length; i++) {
-				var b = buttons[i];
-				var val = controller.buttons[i];
-				var pressed = val == 1.0;
-				if (typeof(val) == "object") {
-					pressed = val.pressed;
-					val = val.value;
-				}
-				var pct = Math.round(val * 100) + "%";
-				b.style.backgroundSize = pct + " " + pct;
-				if (pressed) {
-					b.className = "button pressed";
-				} else {
-					b.className = "button";
-				}
-			}
 
-			updateAxis(d, controller.axes);
+	
+	function addgamepad(gamepad) {
+		var e;
+		console.info('addgamepad: ', gamepad);
+		controllers[gamepad.index] = gamepad; var d = document.createElement('div');
+		d.setAttribute('id', 'controller' + gamepad.index);
+		var t = document.createElement('h1');
+		t.appendChild(document.createTextNode('gamepad: ' + gamepad.id));
+		d.appendChild(t);
+		var b = document.createElement('div');
+		b.className = 'buttons';
+		for (var i=0; i<gamepad.buttons.length; i++) {
+			e = document.createElement('span');
+			e.className = 'button';
+			//e.id = 'b' + i;
+			e.innerHTML = i;
+			b.appendChild(e);
 		}
+		d.appendChild(b);
+		var a = document.createElement('div');
+		a.className = 'axes';
+		for (i=0; i<gamepad.axes.length; i++) {
+			e = document.createElement('progress');
+			e.className = 'axis';
+			//e.id = 'a' + i;
+			e.setAttribute('max', '2');
+			e.setAttribute('value', '1');
+			e.innerHTML = i;
+			a.appendChild(e);
+		}
+		d.appendChild(a);
+		// document.getElementById('start').style.display = 'none';
+		document.body.appendChild(d);
 		rAF(updateStatus);
 	}
+	
+	function removegamepad(gamepad) {
+		var d = document.getElementById('controller' + gamepad.index);
+		document.body.removeChild(d);
+		delete controllers[gamepad.index];
+	}
+	
+	function connecthandler(e) {
+		addgamepad(e.gamepad);
+	}
 
+	function disconnecthandler(e) {
+		removegamepad(e.gamepad);
+	}
+	
 	function scangamepads() {
 		var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
 		for (var i = 0; i < gamepads.length; i++) {
@@ -388,11 +380,42 @@ angular.module('Cocoweb')
 			}
 		}
 	}
+	
+	updateStatus = function() {
+		scangamepads();
+		for (var j in controllers) {
+			if (controllers.hasOwnProperty(j)) {
+				var controller = controllers[j];
+				var d = document.getElementById('controller' + j);
+				var buttons = d.getElementsByClassName('button');
+				for (var i=0; i<controller.buttons.length; i++) {
+					var b = buttons[i];
+					var val = controller.buttons[i];
+					var pressed = val === 1.0;
+					if (typeof(val) === 'object') {
+						pressed = val.pressed;
+						val = val.value;
+					}
+					var pct = Math.round(val * 100) + '%';
+					b.style.backgroundSize = pct + ' ' + pct;
+					if (pressed) {
+						b.className = 'button pressed';
+					} else {
+						b.className = 'button';
+					}
+				}
+
+				updateAxis(d, controller.axes);
+			}
+		}
+		rAF(updateStatus);
+	};
+
 
 	if (haveEvents) {
 	console.info('bind event');
-		window.addEventListener("gamepadconnected", connecthandler);
-		window.addEventListener("gamepaddisconnected", disconnecthandler);
+		window.addEventListener('gamepadconnected', connecthandler);
+		window.addEventListener('gamepaddisconnected', disconnecthandler);
 		scangamepads();
 	} else {
 		console.info('poll');
@@ -404,13 +427,7 @@ angular.module('Cocoweb')
 	
 	
 	
-function	findByKey(array, search, keyName) {
-	for (var i=0; i<array.length; i++)
-		if (array[i] && array[i][keyName] === search)
-			return array[i];
-	return null;
-}
-	
 }]);
+
 
 })();

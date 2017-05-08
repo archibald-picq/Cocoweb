@@ -1,0 +1,42 @@
+{
+  "name": "dashboard",
+  "version": "0.0.1",
+  "description": "Dashboard coconode",
+  "main": "index.html",
+  "scripts": {
+    "prod": "grunt prod"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/archibald-picq/Cocoweb.git"
+  },
+  "keywords": [
+    "coconode",
+    "raspberry",
+    "arduino",
+    "i2c",
+    "dashboard"
+  ],
+  "author": "Archibald Picq",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "express": "^4.15.2",
+    "express-http-proxy": "^1.0.2",
+    "express-proxy": "0.0.2",
+    "grunt": "^1.0.1",
+    "grunt-bower-install-simple": "^1.2.3",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "^2.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-file-creator": "^0.1.3",
+    "grunt-pleeease": "^1.4.0",
+    "grunt-scss-lint": "^0.5.0",
+    "load-grunt-tasks": "^3.5.2",
+    "q": "^1.4.1",
+    "uglify-js": "^2.7.5"
+  }
+}
