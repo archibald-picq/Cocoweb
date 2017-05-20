@@ -38,6 +38,7 @@ angular.module('Cocoweb', [
 	};
 })())
 .config(['Server', function(Server) {
+	var root = document.location.protocol+'//'+document.location.hostname+':'+document.location.port;
 	Server.apiUrl = typeof window.config === 'object' && window.config.api? window.config.api: root;
 }])
 /**

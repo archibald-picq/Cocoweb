@@ -12,17 +12,16 @@ angular.module('Cocoweb').config([
 		$stateProvider
 			.state('root', {
 				abstract: true,
-
+				controller: 'RootController',
 				templateUrl: 'layout.html',
-				controller: 'RootController'
 			})
 			.state('root.layout', {
 				abstract: true,
 				views: {
-					// 'header': {
-						// controller: 'HeaderController',
-						// templateUrl: 'shared/templates/header.html'
-					// },
+					'header': {
+						controller: 'HeaderController',
+						templateUrl: 'shared/templates/header.html'
+					},
 					'': {
 						template: '<div data-ui-view></div>'
 					},

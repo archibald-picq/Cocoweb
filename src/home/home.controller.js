@@ -7,176 +7,29 @@ var DIGITAL_OUT_TWO_WAY = 0x02;	// for motor with 1 speed in both directions
 // var DIGITAL_IN = 0x04;
 var ANALOG_IN = 0x05;
 	
-function	findByKey(array, search, keyName) {
-	for (var i=0; i<array.length; i++)
-		if (array[i] && array[i][keyName] === search)
-			return array[i];
-	return null;
-}
 
 angular.module('Cocoweb')
 .controller('HomeController', [
-            '$scope', '$websocket', '$location', '$q', 'Server',
-	function($scope,   $websocket,   $location,   $q,   Server) {
+            '$scope', '$location', '$q', 'Server', 'SocketService', 'DevicesService',
+	function($scope,   $location,   $q,   Server,   SocketService,   DevicesService) {
 	
 	var maxxBoard = null;
 	var motorLeft = null;
 	var motorRight = null;
-	var socket = null;
 	
 	var AXIS_X = 0;
 	var AXIS_Y = 1;
 	var AXIS_Z = 5;
 	var THROTTLE = 6;
 	
-	function	removeDevice(address) {
-		for (var i = 0; i<$scope.boards.length; i++)
-			if ($scope.boards[i].address === address) {
-				$scope.boards.splice(i, 1);
-				return;
-			}
-		console.warn('device ', address, ' not found for removing');
-	}
-	
-	function	updateStats(stats) {
-		$scope.stats = (Math.round(stats.ping*100)/100)+' ms';
-		$scope.stats += ', '+(Math.round(stats.frequency*10)/10)+' req/s';
-		$scope.stats += ', '+Math.round(stats.succeed / (stats.succeed + stats.failed) * 100)+' %';
-	}
-	
-	function	importClient(client) {
-		if (client.sensors) {
-			var motor;
-			if ((motor = findByKey(client.sensors, 'm1', 'code')) !== null)
-				motorLeft = motor;
-			if ((motor = findByKey(client.sensors, 'm2', 'code')) !== null)
-				motorRight = motor;
-			if (motorLeft && motorRight) {
-				console.warn('found motor left: ', motorLeft, ' and right: ', motorRight);
-				maxxBoard = client;
-			}
-		}
-		for (var code in client.sensors)
-			if (client.sensors.hasOwnProperty(code)) {
-				// if (code.indexOf()
-				client.sensors[code].code = code;
-			}
-		return client;
-	}
-	
-	function	importClients(tab) {
-		for (var i=0; i<tab.length; i++)
-			tab[i] = importClient(tab[i]);
-		return tab;
-	}
-	
-	function	findBoard(addr) {
-		return findByKey($scope.boards, addr, 'address');
-	}
-	
-	function	updateSensors(clients) {
-		// console.info('client.sensors: ', JSON.stringify(clients));
-		for (var addr in clients)
-			if (clients.hasOwnProperty(addr)) {
-				addr = parseInt(addr, 10);
-				var board = findBoard(addr);
-				if (board) {
-					var newValues = clients[addr];
-					var sensor;
-					for (var code in newValues)
-						if (newValues.hasOwnProperty(code)) {
-							if ((sensor = board.sensors[code]) !== null)
-								sensor.value = newValues[code];
-							else
-								console.warn('sensor ', code, ' not found in ', board.sensors);
-						}
-					
-				}
-				else
-					console.warn('board ', addr, ' (',typeof addr,') not found ', $scope.boards);
-				
-			}
-	}
 	
 	function	send(obj) {
-		socket.send(JSON.stringify(obj));
+		SocketService.send(obj);
 	}
 	
 	
 	
-	$scope.stats = '';
-	var url = Server.apiUrl;
-	url = url.replace(/^http(s?):/, 'ws$1:');
-	console.info('connecting to ', url);
-	
-	socket = $websocket(url, {reconnectIfNotNormalClose:true});
-	socket.onMessage(function(message) {
-		// con.messageCount++;
-		
-		// con.averages.push({time: new Date(), bytes: message.data.length});
-		// con.speed = calcBandwidth(con.averages);
-		// console.info('onMessage(',message.data,')');
-		var obj;
-		try {
-			obj = JSON.parse(message.data);
-		}
-		catch(e) {
-			console.warn('Unparsable payload "'+message+'\': ', e.message);
-			return;
-		}
-		if (obj.response && obj.response.currentDevices) {
-			$scope.boards = importClients(obj.response.currentDevices);
-			console.info('boards: ', $scope.boards);
-		}
-		else if (obj.newClient) {
-			console.info('newClient(',obj.newClient,')');
-			$scope.boards.push(importClient(obj.newClient));
-		}
-		else if (obj.clientLost) {
-			removeDevice(obj.clientLost);
-		}
-		else if (obj.stats) {
-			updateStats(obj.stats);
-		}
-		else if (obj.clientUpdate) {
-			console.info('client.sensors: ', JSON.stringify(obj.clientUpdate.sensors));
-			for (var i = 0; i<$scope.boards.length; i++)
-				if ($scope.boards[i].address === obj.clientUpdate.address) {
-					$scope.boards[i] = importClient(obj.clientUpdate);
-					break ;
-				}
-		}
-		else if (obj.sensorsUpdate) {
-			// console.info('sensorsUpdate ', JSON.stringify(obj.sensorsUpdate));
-			updateSensors(obj.sensorsUpdate);
-		}
-		else
-			console.info('message: ', obj);
-		
-		$scope.$apply();
-	});
-	
-	socket.onOpen(function() {
-		console.info('onOpen');
-		$scope.connected = true;
-		send({command: 'currentDevices'});
-		// con.state = 'connected';
-		$scope.$apply();
-	});
-	socket.onClose(function() {
-		console.info('onClose');
-		$scope.connected = false;
-		// con.state = 'connecting';
-		$scope.stats = '';
-		$scope.$apply();
-	});
-	socket.onError(function() {
-		console.info('onError');
-		// con.state = 'failed';
-		$scope.$apply();
-	});
-	
-	$scope.boards = [];
+	$scope.boards = DevicesService.devices;
 	
 	$scope.connected = false;
 	

@@ -1,0 +1,18 @@
+<h2>Edit device <span data-ng-bind="address"></span></h2>
+
+<form data-ng-submit="saveAndExit()">
+	<div class="input name">
+		<label for="device-edit-name">Name</label>
+		<input id="device-edit-name" type="text" data-ng-model="name">
+	</div>
+	<div class="input id">
+		<label for="device-edit-id">Id</label>
+		<input id="device-edit-id" type="text" data-ng-model="address">
+	</div>
+	
+	<div class="buttons">
+		<span class="saving" data-ng-show="saving">save in progress</span>
+		<span class="error" data-ng-show="error" data-ng-bind="error"></span>
+		<input type="submit" value="save">
+	</div>
+</form>
