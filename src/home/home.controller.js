@@ -1,8 +1,6 @@
 (function() {
 'use strict';
 
-var DIGITAL_OUT = 0x01;		// for led, light, on/off purpose
-var DIGITAL_OUT_TWO_WAY = 0x02;	// for motor with 1 speed in both directions
 // var DIGITAL_OUT_THREE_WAY = 0x03;		// for led, light, on/off purpose
 // var DIGITAL_IN = 0x04;
 var ANALOG_IN = 0x05;
@@ -34,13 +32,14 @@ angular.module('Cocoweb')
 	$scope.connected = false;
 	
 	// var allValue = 0;
-	$scope.command = function(board, sensor, value, fromEvent) {
-		if (sensor.applyValue === value)
-			return;
-		console.info(new Date(), sensor.name, value, fromEvent);
-		// sensor.applyValue = value;
-		send({command:'setValue', params: {address: board.address, code: sensor.code, value: value}});
-	};
+	$scope.command = DevicesService.command;
+	// function(board, sensor, value, fromEvent) {
+		// if (sensor.applyValue === value)
+			// return;
+		// console.info(new Date(), sensor.name, value, fromEvent);
+		// // sensor.applyValue = value;
+		// send({command:'setValue', params: {address: board.address, code: sensor.code, value: value}});
+	// };
 	$scope.askName = function(board) {
 		send({command:'askName', params: {address: board.address}});
 	};
@@ -71,21 +70,12 @@ angular.module('Cocoweb')
 			return value;
 	};
 
-	$scope.isDigitalOut = function(sensor) {
-		return sensor.type === DIGITAL_OUT;
-	};
-	$scope.isDigitalOutTwoWay = function(sensor) {
-		return sensor.type === DIGITAL_OUT_TWO_WAY;
-	};
-	$scope.isOn = function(sensor) {
-		return !!sensor.value;
-	};
-	$scope.isPositive = function(sensor) {
-		return sensor.value > 0;
-	};
-	$scope.isNegative = function(sensor) {
-		return sensor.value < 0;
-	};
+	$scope.isDigitalOut = DevicesService.isDigitalOut;
+	$scope.isDigitalOutTwoWay = DevicesService.isDigitalOutTwoWay;
+	$scope.isOn = DevicesService.isOn;
+	$scope.isPositive = DevicesService.isPositive;
+	$scope.isNegative = DevicesService.isNegative;
+	
 	$scope.boardName = function(board) {
 		var hexAddr = 'i2c 0x'+board.address.toString(16);
 		if (board.name) {

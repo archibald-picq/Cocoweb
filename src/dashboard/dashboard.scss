@@ -1,0 +1,64 @@
+$widget-color-background: #b5b5b5;
+$widget-color-handler-resize: #8c8c8c;
+$color-warning: #ff0000;
+
+.dashboard {
+	.buttons {
+		padding: 10px 0;
+		text-align: right;
+	}
+
+	.device {
+		background: $widget-color-background;
+
+		.drag-handler {
+			bottom: 0;
+			left: 0;
+			position: absolute;
+			right: 0;
+			top: 0;
+		}
+
+		.gridster-item-resizable-handler.handle-n,
+		.gridster-item-resizable-handler.handle-s,
+		.gridster-item-resizable-handler.handle-e,
+		.gridster-item-resizable-handler.handle-w {
+			background: $widget-color-handler-resize;
+			opacity: .5;
+		}
+
+		.widget {
+			position: absolute;
+			text-align: center;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 100%;
+		}
+
+		.remove {
+			bottom: 15px;
+			color: $color-warning;
+			font-size: 1.5em;
+			position: absolute;
+			right: 15px;
+		}
+
+		widget-button {
+			display: block;
+
+			.name {
+				font-size: .8em;
+			}
+		}
+
+		widget-linky {
+			.value {
+				font-size: 1.5em;
+			}
+		}
+
+		widget-thermometer {
+			font-size: 2em;
+		}
+	}
+}

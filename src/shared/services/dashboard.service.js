@@ -9,7 +9,7 @@ angular.module('Cocoweb')
 	}
 	
 	function saveItems(items) {
-		localStorage.setItem('dashboard', JSON.stringify(items));
+		localStorage.setItem('dashboard', angular.toJson(items));
 	}
 
 

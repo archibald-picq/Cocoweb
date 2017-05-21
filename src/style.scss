@@ -10,6 +10,7 @@ $menu-color-background: #ffffff;
 @import '../.sass-cache/angular-gridster/src/angular-gridster';
 @import 'shared/header';
 @import 'shared/menu';
+@import 'dashboard/dashboard';
 @import 'home/home';
 
 body {
@@ -24,13 +25,6 @@ h2 {
 h3 {
 	color: $soft-color;
 	margin: 5px 0 10px;
-}
-
-
-.gridster {
-	.device {
-		background: grey;
-	}
 }
 
 

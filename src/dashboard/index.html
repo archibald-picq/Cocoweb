@@ -1,7 +1,19 @@
-<div>dashboard</div>
+<div class="dashboard">
+	<div class="buttons">
+		<button data-ng-click="toggleEditMode()" data-ng-bind="editMode? 'use': 'edit'"></button>
+		<button data-ui-sref="root.layout.dashboard.add">add</button>
+	</div>
 
-<div gridster="gridsterOpts">
-	<ul>
-		<li gridster-item="item" ng-repeat="item in standardItems" class="device"></li>
-	</ul>
+	<div gridster="gridsterOpts">
+		<ul>
+			<li gridster-item="item" ng-repeat="item in standardItems" class="device">
+				<dynamic-widget class="widget" item="item">
+					{{item.widget.sensor}}
+				</dynamic-widget>
+				<div data-ng-if="editMode" class="drag-handler"></div>
+				<div class="remove" data-ng-if="editMode" data-ng-click="removeItem(item)">🗑</div>
+			</li>
+		</ul>
+	</div>
+	<div ui-view class="view-side-form"></div>
 </div>

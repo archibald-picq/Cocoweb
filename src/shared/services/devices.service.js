@@ -1,6 +1,11 @@
 (function() {
 'use strict';
 
+var DIGITAL_OUT = 0x01;		// for led, light, on/off purpose
+var DIGITAL_OUT_TWO_WAY = 0x02;	// for motor with 1 speed in both directions
+var LINKY_MODULE = 0x06;
+var THERMOMETER_MODULE = 0x07;
+
 function	findByKey(array, search, keyName) {
 	for (var i=0; i<array.length; i++)
 		if (array[i] && array[i][keyName] === search)
@@ -78,11 +83,11 @@ angular.module('Cocoweb')
 	
 	var waiters = [];
 	function triggerDeviceWaiters() {
-		console.info('triggerDeviceWaiters');
+		// console.info('triggerDeviceWaiters');
 		for (var i=0, device; i<waiters.length; i++) {
 			device = findByKey(boards, waiters[i].address, 'address');
 			if (device) {
-				console.info('delayed resolve ', waiters[i].address, ' => ', device);
+				// console.info('delayed resolve ', waiters[i].address, ' => ', device);
 				waiters[i].deferred.resolve(device);
 			}
 			else {
@@ -99,19 +104,23 @@ angular.module('Cocoweb')
 			importClients(obj.response.currentDevices);
 			console.info('boards: ', boards);
 			triggerDeviceWaiters();
+			$rootScope.$broadcast('updateBoards', obj);
 		}
 		else if (obj.newClient) {
 			console.info('newClient(',obj.newClient,')');
 			boards.push(importClient(obj.newClient));
+			$rootScope.$broadcast('updateBoards', obj);
 		}
 		else if (obj.clientLost) {
 			removeDevice(obj.clientLost);
+			$rootScope.$broadcast('updateBoards', obj);
 		}
 		else if (obj.clientUpdate) {
 			console.info('client.sensors: ', JSON.stringify(obj.clientUpdate.sensors));
 			for (var i = 0; i<boards.length; i++)
 				if (boards[i].address === obj.clientUpdate.address) {
 					boards[i] = importClient(obj.clientUpdate);
+					$rootScope.$broadcast('updateBoards', obj);
 					break ;
 				}
 		}
@@ -127,12 +136,12 @@ angular.module('Cocoweb')
 		
 		var device = findByKey(boards, address, 'address');
 		if (device) {
-			console.info('instant resolve ', address, ' => ', device);
+			// console.info('instant resolve ', address, ' => ', device);
 			deferred.resolve(device);
 		}
 		else {
 			var tm = $timeout(function() {
-				console.info('timeout reject ', address);
+				// console.info('timeout reject ', address);
 				deferred.reject();
 			}, 5000);
 			waiters.push({address: address, deferred: deferred, timeout: tm});
@@ -164,6 +173,46 @@ angular.module('Cocoweb')
 		
 		setName: setDeviceName,
 		setAddress: setDeviceAddress,
+		
+		isDigitalOut: function(sensor) {
+			return sensor.type === DIGITAL_OUT;
+		},
+		isDigitalOutTwoWay: function(sensor) {
+			return sensor.type === DIGITAL_OUT_TWO_WAY;
+		},
+		isOn: function(sensor) {
+			return !!sensor.value;
+		},
+		isPositive: function(sensor) {
+			return sensor.value > 0;
+		},
+		isNegative: function(sensor) {
+			return sensor.value < 0;
+		},
+		isLinky: function(sensor) {
+			return sensor.type === LINKY_MODULE;
+		},
+		isThermometer: function(sensor) {
+			return sensor.type === THERMOMETER_MODULE;
+		},
+		getBoardAndSensor: function(id) {
+			var boardIdSensorId = id.split(':');
+			var address = parseInt(boardIdSensorId[0]);
+			var code = boardIdSensorId[1];
+			
+			return getDevice(address)
+				.then(function(board) {
+					return board.sensors && board.sensors[code]? {board: board, sensor: board.sensors[code]}: null;
+				});
+		},
+		command: function(board, sensor, value, fromEvent) {
+			if (sensor.applyValue === value)
+				return;
+			console.info(new Date(), sensor.name, value, fromEvent);
+			// sensor.applyValue = value;
+			SocketService.send({command:'setValue', params: {address: board.address, code: sensor.code, value: value}});
+		},
+
 	};
 }]);
 

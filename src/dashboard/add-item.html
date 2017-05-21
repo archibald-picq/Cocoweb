@@ -1,0 +1,24 @@
+<div class="side-form">
+	<div class="content">
+		<h2>List of items:</h2>
+		
+		<div class="boards">
+			<div data-ng-show="boards.length" class="empty">
+				No board
+			</div>
+			<div data-ng-repeat="board in boards" class="board">
+				<h2>
+					<span data-ng-bind="boardName(board)"></span>
+				</h2>
+				<div class="sensors">
+					<div data-ng-repeat="sensor in board.sensors" class="sensor">
+						<span class="code">{{sensor.code}}</span>
+						<span class="name">{{sensor.name}}</span>
+						<a href="javascript:" data-ng-click="selectItem(board, sensor)">select</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="background" data-ng-click="cancelEdition()"></div>
+</div>
