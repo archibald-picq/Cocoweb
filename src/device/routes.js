@@ -10,7 +10,7 @@ angular.module('Cocoweb').config([
 				// abstract: true,
 			// })
 			.state('root.layout.home.edit', {
-				url: 'device/:address',
+				url: '/:address',
 				// data: { class: 'home' },
 				templateUrl: 'device/edit.html',
 				controller: 'EditController',

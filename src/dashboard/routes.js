@@ -7,7 +7,7 @@ angular.module('Cocoweb').config([
 
 		$stateProvider
 			.state('root.layout.dashboard', {
-				url: '/dashboard',
+				url: '/',
 				// data: { class: 'home' },
 				templateUrl: 'dashboard/index.html',
 				controller: 'DashboardController',
@@ -18,7 +18,7 @@ angular.module('Cocoweb').config([
 				}
 			})
 			.state('root.layout.dashboard.add', {
-				url: '/add',
+				url: 'add',
 				// data: { class: 'home' },
 				templateUrl: 'dashboard/add-item.html',
 				controller: 'DashboardAddItemController',

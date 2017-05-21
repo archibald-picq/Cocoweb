@@ -6,7 +6,7 @@ angular.module('Cocoweb').config([
 	function($stateProvider,   $urlRouterProvider,   $locationProvider) {
 
 		$stateProvider.state('root.layout.home', {
-			url: '/',
+			url: '/device',
 			// data: { class: 'home' },
 			templateUrl: 'home/index.html',
 			controller: 'HomeController',
