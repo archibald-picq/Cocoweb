@@ -5,6 +5,8 @@ angular.module('Cocoweb', [
 	'angular-websocket',
 	'ui.router',
 	'oc.lazyLoad',
+	'ngAnimate',
+	'gridster',
 ])
 
 .config(['$httpProvider', '$qProvider', function($httpProvider, $qProvider) {

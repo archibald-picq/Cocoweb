@@ -80,7 +80,20 @@ module.exports = function(grunt) {
 					'assets/**/*',
 				],
 				dest: '<%= dirs.build %>'
-			}
+			},
+			libstyles: {
+				flatten: false,
+				expand: true,
+				cwd: '<%= dirs.lib %>/',
+				src: [
+					'angular-gridster/src/angular-gridster.less',
+				],
+				dest: '<%= dirs.build %>/../.sass-cache/',
+				rename: function(dest, src) {
+					console.info('rename: ', dest, src);
+					return dest + src.replace(/(\.min)?\.(c|le)ss$/, '.scss');
+				}
+			},
 		},
 
 		clean: {
@@ -99,7 +112,7 @@ module.exports = function(grunt) {
 			dev: {
 				options: {
 					style: 'expanded', //keep the css readable, anyways it will be compressed later on
-					// sourcemap : 'auto',
+					sourcemap : 'auto',
 					loadPath: [],
 				},
 				files: [{
@@ -132,7 +145,17 @@ module.exports = function(grunt) {
 		},
 
 		pleeease: {
-			custom: {
+			dev: {
+				options: {
+					autoprefixer: {'browsers': ['last 4 versions', 'ie 11', 'Android 4.0']},
+					//minifier: true,
+					sourcemaps: true,
+				},
+				files: {
+					'<%= dirs.build%>/style.css': '<%= dirs.build%>/style.css',
+				},
+			},
+			prod: {
 				options: {
 					autoprefixer: {'browsers': ['last 4 versions', 'ie 11', 'Android 4.0']},
 					minifier: true,
@@ -211,7 +234,7 @@ module.exports = function(grunt) {
 			css: {
 				options: { atBegin: true },
 				files: ['<%= dirs.src %>/**/*.scss'],
-				tasks: ['server-lock', 'scsslint', 'sass:dev', 'pleeease', 'server-unlock']
+				tasks: ['server-lock', 'scsslint', 'sass:dev', 'pleeease:dev', 'server-unlock']
 			}
 		},
 
@@ -246,11 +269,13 @@ module.exports = function(grunt) {
 					'<%= dirs.lib %>/angular-ui-router/release/angular-ui-router.js',
 					'<%= dirs.lib %>/angular-animate/angular-animate.js',
 					'<%= dirs.lib %>/oclazyload/dist/ocLazyLoad.js',
-					'<%= dirs.lib %>/ng-file-upload/ng-file-upload.js',
-					'<%= dirs.lib %>/angular-multiupload/dist/js/multiupload.js',
+					// '<%= dirs.lib %>/ng-file-upload/ng-file-upload.js',
+					// '<%= dirs.lib %>/angular-multiupload/dist/js/multiupload.js',
 //					'<%= dirs.lib %>/angularjs-slider/dist/rzslider.js',
 //					'<%= dirs.lib %>/angular-socialshare/dist/angular-socialshare.js',
 					'<%= dirs.lib %>/angular-websocket/dist/angular-websocket.js',
+					'<%= dirs.lib %>/javascript-detect-element-resize/detect-element-resize.js',
+					'<%= dirs.lib %>/angular-gridster/src/angular-gridster.js',
 				],
 			},
 			full_package_prod: {
@@ -261,11 +286,13 @@ module.exports = function(grunt) {
 					'<%= dirs.lib %>/angular-ui-router/release/angular-ui-router.js',
 					'<%= dirs.lib %>/angular-animate/angular-animate.min.js',
 					'<%= dirs.lib %>/oclazyload/dist/ocLazyLoad.min.js',
-					'<%= dirs.lib %>/ng-file-upload/ng-file-upload.min.js',
-					'<%= dirs.lib %>/angular-multiupload/dist/js/multiupload.min.js',
-					'<%= dirs.lib %>/angularjs-slider/dist/rzslider.min.js',
-					'<%= dirs.lib %>/angular-socialshare/dist/angular-socialshare.min.js',
+					// '<%= dirs.lib %>/ng-file-upload/ng-file-upload.min.js',
+					// '<%= dirs.lib %>/angular-multiupload/dist/js/multiupload.min.js',
+					// '<%= dirs.lib %>/angularjs-slider/dist/rzslider.min.js',
+					// '<%= dirs.lib %>/angular-socialshare/dist/angular-socialshare.min.js',
 					'<%= dirs.lib %>/angular-websocket/dist/angular-websocket.min.js',
+					'<%= dirs.lib %>/javascript-detect-element-resize/detect-element-resize.js',
+					'<%= dirs.lib %>/angular-gridster/dist/angular-gridster.min.js',
 					'<%= dirs.build %>/app/script.js',
 					'<%= dirs.build %>/app/tpl.js',
 				],
@@ -565,6 +592,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('dev', [
 		'bower-install-simple:dev',
 		'clean:build',
+		'copy:libstyles',
 		'uglify:js_libraries_dev',
 		'file-creator:index_html_dev',
 		'serve-async',
@@ -580,7 +608,9 @@ module.exports = function(grunt) {
 		'uglify:full_package_prod',		// pack lib + script + tpl
 		'clean:temp_prod',
 		'copy:assets',
+		'copy:libstyles',
 		'sass:prod',
+		'pleeease:prod',
 	]);
 
 };

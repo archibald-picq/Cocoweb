@@ -6,11 +6,11 @@ angular.module('Cocoweb').config([
 	function($stateProvider,   $urlRouterProvider,   $locationProvider) {
 
 		$stateProvider
-			.state('root.layout.device', {
-				abstract: true,
-			})
-			.state('root.layout.device.edit', {
-				url: '/device/:address',
+			// .state('root.layout.device', {
+				// abstract: true,
+			// })
+			.state('root.layout.home.edit', {
+				url: 'device/:address',
 				// data: { class: 'home' },
 				templateUrl: 'device/edit.html',
 				controller: 'EditController',

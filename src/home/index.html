@@ -3,7 +3,7 @@
 	<div data-ng-repeat="board in boards" class="board">
 		<h2>
 			<span data-ng-bind="boardName(board)"></span>
-			<a data-ui-sref="root.layout.device.edit({address: board.address})">edit</a>
+			<a data-ui-sref="root.layout.home.edit({address: board.address})">edit</a>
 		</h2>
 		<h3 data-ng-show="board.type == 'coco'">
 			<button data-ng-click="askName(board)">askName</button>
@@ -38,3 +38,4 @@
 		</table>
 	</div>
 </div>
+<div ui-view class="view-side-form"></div>

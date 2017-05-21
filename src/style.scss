@@ -2,6 +2,13 @@ $important: #ff0000;
 $main-color: #000000;
 $soft-color: #222222;
 
+$page-animation-duration: .25s;
+$menu-color-overlay: #000000;
+$menu-color-border: #e0e0e0;
+$menu-color-background: #ffffff;
+
+@import '../.sass-cache/angular-gridster/src/angular-gridster';
+
 h1,
 h2 {
 	margin: 0;
@@ -33,6 +40,12 @@ h3 {
 		&.connected .label-connected {
 			visibility: visible;
 		}
+	}
+}
+
+.gridster {
+	.device {
+		background: grey;
 	}
 }
 
@@ -93,4 +106,130 @@ h3 {
 
 .pressed {
 	border: 1px solid $important;
+}
+
+
+.slide-animate.ng-enter,
+.slide-animate.ng-leave {
+	transition: all cubic-bezier(.250, .460, .450, .940) 2s;
+}
+
+
+.slide-animate.ng-enter {
+	left: 0;
+
+	&.ng-enter-active {
+		left: 1300px;
+		position: absolute;
+	}
+}
+
+.slide-animate.ng-leave {
+	right: 0;
+
+	&.ng-leave-active {
+		left: -1700px;
+		position: absolute;
+	}
+}
+
+
+
+// side form
+.view-side-form {
+	.side-form {
+		bottom: 0;
+		left: 0;
+		position: fixed;
+		right: 0;
+		top: 0;
+
+		.content {
+			background: $menu-color-background;
+			border-left: 1px solid $menu-color-border;
+			height: 100%;
+			overflow: auto;
+			padding: 20px;
+			position: absolute;
+			right: 0;
+			top: 0;
+			width: 60%;
+			z-index: 100;
+		}
+
+		.background {
+			background: $menu-color-overlay;
+			height: 100%;
+			opacity: .8;
+			width: 100%;
+		}
+	}
+
+
+	// TRANSITION ANIMATIONS FOR SIDE FORM VIEW
+	// ------------------------------------------
+
+	// animations for side form view
+	&.ng-enter,
+	&.ng-leave {
+		// transition on enter and leave for $page-animation-duration
+		transition: $page-animation-duration;
+	}
+
+	// start 'enter' transition
+	&.ng-enter {
+		.side-form {
+			.content {
+				// start with content 80% off the right of the page
+				right: -60%;
+			}
+
+			.background {
+				// start with background opacity 0 (invisible)
+				opacity: 0;
+			}
+		}
+	}
+
+	// end 'enter' transition
+	&.ng-enter-active {
+		.side-form {
+			.content {
+				// end with content aligned to the right of the page
+				right: 0;
+
+				// transition the right position which slides the content into view
+				transition: right $page-animation-duration;
+			}
+
+			.background {
+				// end with background opacity 0.8 to give the overlay effect
+				opacity: .8;
+
+				// transition the background opacity to fades it in
+				transition: opacity $page-animation-duration;
+			}
+		}
+	}
+
+	// end 'leave' transition
+	&.ng-leave-active {
+		.side-form {
+			.content {
+				// end transition with the content completely off the page
+				right: -100%;
+
+				// transition the right position which slides the content out of view
+				transition: right $page-animation-duration;
+			}
+
+			.background {
+				// end with background opacity 0 to hide it
+				opacity: 0;
+
+				// transition the background opacity to fades it out
+				transition: opacity $page-animation-duration;
+			}
+		}
+	}
 }
