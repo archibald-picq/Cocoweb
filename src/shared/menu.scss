@@ -1,0 +1,117 @@
+// $page-animation-duration: 1s;
+
+// side form
+.menu {
+	.side-form {
+		bottom: 0;
+		left: 0;
+		position: fixed;
+		right: 0;
+		top: 0;
+		z-index: 10;
+
+		.content {
+			background: $menu-color-background;
+			border-right: 1px solid $menu-color-border;
+			height: 100%;
+			overflow: auto;
+			padding: 10px;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 60%;
+			z-index: 100;
+		}
+
+		.background {
+			background: $menu-color-overlay;
+			height: 100%;
+			opacity: .8;
+			width: 100%;
+		}
+	}
+
+
+	// TRANSITION ANIMATIONS FOR SIDE FORM VIEW
+	// ------------------------------------------
+
+	// animations for side form view
+	&.ng-enter,
+	&.ng-leave,
+	&.ng-hide-add,
+	&.ng-hide-remove {
+		// transition on enter and leave for $page-animation-duration
+		transition: $page-animation-duration;
+	}
+
+	// start 'enter' transition
+	&.ng-enter,
+	&.ng-hide-remove {
+		.side-form {
+			.content {
+				// start with content 60% off the left of the page
+				left: -60%;
+			}
+
+			.background {
+				// start with background opacity 0 (invisible)
+				opacity: 0;
+			}
+		}
+	}
+
+	// end 'enter' transition
+	&.ng-enter-active,
+	&.ng-hide-remove.ng-hide-remove-active {
+		.side-form {
+			.content {
+				// end with content aligned to the left of the page
+				left: 0;
+
+				// transition the left position which slides the content into view
+				transition: left $page-animation-duration;
+			}
+
+			.background {
+				// end with background opacity 0.8 to give the overlay effect
+				opacity: .8;
+
+				// transition the background opacity to fades it in
+				transition: opacity $page-animation-duration;
+			}
+		}
+	}
+
+	// end 'leave' transition
+	&.ng-leave-active,
+	&.ng-hide-add.ng-hide-add-active {
+		.side-form {
+			.content {
+				// end transition with the content completely off the page
+				left: -100%;
+
+				// transition the left position which slides the content out of view
+				transition: left $page-animation-duration;
+			}
+
+			.background {
+				// end with background opacity 0 to hide it
+				opacity: 0;
+
+				// transition the background opacity to fades it out
+				transition: opacity $page-animation-duration;
+			}
+		}
+	}
+	
+	.content {
+		h1 {
+			margin: 4px 0 0 10px;
+		}
+		.header {
+			display: flex;
+			flex-direction: row;
+		}
+	}
+}
+

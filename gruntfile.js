@@ -90,7 +90,7 @@ module.exports = function(grunt) {
 				],
 				dest: '<%= dirs.build %>/../.sass-cache/',
 				rename: function(dest, src) {
-					console.info('rename: ', dest, src);
+					// console.info('rename: ', dest, src);
 					return dest + src.replace(/(\.min)?\.(c|le)ss$/, '.scss');
 				}
 			},

@@ -18,15 +18,19 @@ angular.module('Cocoweb').config([
 			.state('root.layout', {
 				abstract: true,
 				views: {
+					'menu': {
+						controller: 'MenuController',
+						templateUrl: 'shared/templates/menu.html',
+					},
 					'header': {
 						controller: 'HeaderController',
-						templateUrl: 'shared/templates/header.html'
+						templateUrl: 'shared/templates/header.html',
 					},
 					'': {
-						template: '<div data-ui-view></div>'
+						template: '<div data-ui-view></div>',
 					},
 					// 'footer': {
-						// templateUrl: 'shared/templates/footer.html'
+						// templateUrl: 'shared/templates/footer.html',
 					// }
 				}
 			});

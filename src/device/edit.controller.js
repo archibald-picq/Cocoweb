@@ -27,6 +27,10 @@ angular.module('Cocoweb')
 				$scope.error = err;
 			});
 	};
+	
+	$scope.cancelEdition = function() {
+		$window.history.back();
+	};
 }]);
 
 })();

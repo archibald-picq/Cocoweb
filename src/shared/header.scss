@@ -1,0 +1,33 @@
+
+.burger-menu.icon {
+	background: url(../assets/burger-menu.png) no-repeat;
+	background-size: cover;
+	display: inline-block;
+	cursor: pointer;
+	height: 32px;
+	width: 32px;
+}
+
+.status-bar {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+
+	.stats {
+		display: inline-block;
+	}
+
+	.connection-state {
+		border: 2px solid $main-color;
+		display: inline-block;
+		padding: 5px;
+
+		.label-connected {
+			visibility: hidden;
+		}
+
+		&.connected .label-connected {
+			visibility: visible;
+		}
+	}
+}
